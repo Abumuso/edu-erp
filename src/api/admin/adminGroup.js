@@ -25,5 +25,13 @@ const adminGroup = {
     const url = "group-students/add-student";
     return axiosClient.post(url, payload);
   },
+  getGroupTeacher(id) {
+    const url = `courses/all-teachers/${id}`;
+    return axiosClient.get(url);
+  },
+  addGroupTeacher(payload) {
+    const url = "groups/add-teacher";
+    return axiosClient.post(url, payload);
+  },
 };
 export default adminGroup;

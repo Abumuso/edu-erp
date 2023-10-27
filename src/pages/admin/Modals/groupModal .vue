@@ -38,13 +38,28 @@
       </select>
     </div>
     <div>
-      <select class="m-3 border-2" v-model="select_course">
+      <select
+        class="m-3 border-2"
+        v-model="select_course"
+        @change="handleChangeCourse($event)">
         <option value="" selected hidden>Select course</option>
         <option
           :value="item._id"
           v-for="(item, index) in store2?.courses"
           :key="index">
           {{ item.name }}
+        </option>
+      </select>
+      <select
+        class="m-3 border-2"
+        v-model="select_teacher"
+        v-if="store?.teachers.length">
+        <option value="" selected hidden>Select teacher</option>
+        <option
+          :value="item._id"
+          v-for="(item, index) in store?.teachers"
+          :key="index">
+          {{ item.first_name }}
         </option>
       </select>
     </div>
@@ -56,15 +71,15 @@
 <script setup>
 import { computed, ref, watch, reactive } from "vue";
 import AppModal from "../../../components/ui/app-modal.vue";
-import VInput from "../../../components/form/VInput.vue";
+// import VInput from "../../../components/form/VInput.vue";
 import { useGroupStore } from "../../../stores/admin/group";
 import { useCourseStore } from "../../../stores/admin/course";
 import moment from "moment";
-import VDelete from "../../../components/form/VDelete.vue";
+// import VDelete from "../../../components/form/VDelete.vue";
 import VButton from "../../../components/form/VButton.vue";
 
-const store = useGroupStore();
-const store2 = useCourseStore();
+const group_store = useGroupStore();
+const course_store = useCourseStore();
 const dialog = ref(false);
 const dialog2 = ref(false);
 const loading = ref(false);
@@ -74,14 +89,16 @@ const days = ref(null);
 const group_name = ref("");
 const select_room = ref("");
 const select_course = ref("");
+const select_teacher = ref("");
 const start_time = ref();
 const end_time = ref();
-const start_date = ref();
 const values = reactive({
   start_date: "",
   start_time: "",
   end_time: "",
 });
+const value1 = ref([new Date(), new Date()]);
+const value2 = ref("");
 
 const handleChangeDays = (e) => {
   if (e.target.value == "even") {
@@ -108,7 +125,12 @@ const handleChangeTime = async (e) => {
     end_time: end_time.value,
     days: days.value,
   };
-  await store.availableAdminRooms(payload.value);
+  await group_store.availableAdminRooms(payload.value);
+};
+
+const handleChangeCourse = async (e) => {
+  console.log(e.target.value);
+  await group_store.getGroupTeacher(e.target.value);
 };
 
 let forms = ref({
@@ -118,7 +140,7 @@ let forms = ref({
 
 const openModal = (item) => {
   dialog.value = true;
-  store2.getAdminCourses({
+  course_store.getAdminCourses({
     page: 1,
     limit: 10,
     last_page: null,
@@ -144,16 +166,22 @@ const save = async () => {
     end_time: end_time.value,
     days: days.value,
     room_id: select_room.value,
-    course_id: select_course.value,
+    course: select_course.value,
+    teacher_id: select_teacher.value,
+    status: true,
   };
-  console.log(result);
-  await store.createAdminGroup(result);
+  await group_store.createAdminGroup(result);
+  let result2 = {
+    group: group_store?.group_id,
+    teacher: select_teacher.value,
+  };
+  await group_store.addGroupTeacher(result2);
 };
 
 const schema = computed(() => {
   return {
-    name: "required|min:3|max:15",
-    size: "required|min:1|max:15",
+    name: "required|min:3|max:25",
+    size: "required|min:2|max:15",
   };
 });
 const btn_title = computed(() => {
@@ -171,16 +199,16 @@ const send = async (values) => {
   console.log(values);
   if (!forms.value._id) {
     loading.value = true;
-    await store.createAdminGroup(values);
+    await group_store.createAdminGroup(values);
     loading.value = false;
   } else {
     loading.value = true;
-    await store.updateAdminGroup(payload, forms.value._id);
+    await group_store.updateAdminGroup(payload, forms.value._id);
     loading.value = false;
   }
 };
 const deleteGroup = async () => {
-  await store.deleteAdminGroup(unique_id.value);
+  await group_store.deleteAdminGroup(unique_id.value);
 };
 defineExpose({ openModal, openDeleteModal });
 </script>

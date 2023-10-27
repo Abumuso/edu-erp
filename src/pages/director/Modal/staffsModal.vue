@@ -33,7 +33,7 @@
         placeHolder="Phone Number" />
       <VSelect
         label="Select a course"
-        :options="store.courses"
+        :options="store?.courses"
         name="course"
         v-if="is_active"></VSelect>
       <div class="flex justify-center mt-[30px]">
@@ -64,11 +64,11 @@ let forms = ref({
   last_name: "",
   phone: "",
 });
-const roles = ref([
-  { name: "admin" },
-  { name: "teacher" },
-  { name: "finance" },
-]);
+// const roles = ref([
+//   { name: "admin" },
+//   { name: "teacher" },
+//   { name: "finance" },
+// ]);
 const schema = computed(() => {
   return {
     first_name: "required|min:3|max:15",
@@ -78,6 +78,16 @@ const schema = computed(() => {
     course: "min:3|max:19",
   };
 });
+
+const handleChange = (e) => {
+  let val = JSON.parse(e.target.value);
+  if (val.name == "teacher") {
+    is_active.value = true;
+  } else {
+    is_active.value = false;
+  }
+};
+
 const btn_title = computed(() => {
   if (loading.value) {
     return "Loading";
@@ -89,15 +99,6 @@ const btn_title = computed(() => {
     }
   }
 });
-
-const handleChange = (e) => {
-  let val = JSON.parse(e.target.value);
-  if (val.name == "teacher") {
-    is_active.value = true;
-  } else {
-    is_active.value = false;
-  }
-};
 
 const openModal = () => {
   dialog.value = true;
