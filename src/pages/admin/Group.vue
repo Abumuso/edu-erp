@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="flex flex-col gap-3 items-start p-3">
     <groupModal ref="modal_value" />
     <h1>Admin Groups</h1>
     <VButton btn_type="primary" @click="openModal">Create group</VButton>
@@ -17,60 +17,48 @@
         </div>
       </template>
       <template #body_start_date="{ item }">
-        <span>{{ formatData(item?.start_date) }}</span>
+        <span>{{ FormatDate(item?.start_date) }}</span>
       </template>
       <template #body_end_date="{ item }">
-        <span>{{ formatData(item?.end_date) }}</span>
+        <span>{{ FormatDate(item?.end_date) }}</span>
       </template>
       <template #body_start_time="{ item }">
-        <span>{{ formatTime(item?.start_time) }}</span>
+        <span>{{ FormatTime(item?.start_time) }}</span>
       </template>
       <template #body_end_time="{ item }">
-        <span>{{ formatTime(item?.end_time) }}</span>
+        <span>{{ FormatTime(item?.end_time) }}</span>
       </template>
       <template #body_course_id="{ item }">
         <span>{{ item?.course_id?.name }}</span>
       </template>
       <template #body_action="{ item }">
-        <VAction :item="item" :modal_value="modal_value" path="/single_group"/>
-
-        <!-- <VButton btn_type="primary" @click="openEditModal(item)">Edit</VButton>
-        <VButton btn_type="danger" @click="openDeleteModal(item._id)"
-          >Delete</VButton
-        > -->
+        <VAction :item="item" :modal_value="modal_value" path="/single_group" />
       </template>
     </app-table>
   </div>
 </template>
 
 <script setup>
-import { computed, onMounted, ref } from "vue";
+import { onMounted, ref } from "vue";
 import { useGroupStore } from "../../stores/admin/group";
-import AppTable from "../../components/ui/app-table.vue";
+import AppTable from "../../components/ui/app-table.vue";computed
 import VButton from "../../components/form/VButton.vue";
 import groupModal from "./Modals/groupModal .vue";
-import moment from "moment";
 import VAction from "../../components/form/VAction.vue";
+import { FormatDate, FormatTime } from "../../hooks/FormatDate";
 
 const store = useGroupStore();
 const modal_value = ref();
-
-const formatData = (data) => {
-  return moment(data).format("YYYY-MM-DD");
-};
-
-const formatTime = (time) => {
-  let hour = `${parseInt(time / 60)}`.padStart(2, 0);
-  let minute = `${time % 60}`.padStart(2, 0);
-  let result = `${hour}:${minute}`;
-  return result;
-};
-
 const params = ref({
   page: 1,
   limit: 10,
   last_page: null,
 });
+
+const openModal = () => {
+  modal_value.value.openModal();
+};
+
 const headers = ref([
   { title: "Group name", value: "name" },
   { title: "Course name", value: "course_id" },
@@ -82,10 +70,6 @@ const headers = ref([
   { title: "Status", value: "status" },
   { title: "Action", value: "action" },
 ]);
-
-const openModal = () => {
-  modal_value.value.openModal();
-};
 
 onMounted(() => {
   store.getAdminGroups(params.value);

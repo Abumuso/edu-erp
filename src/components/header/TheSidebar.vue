@@ -25,6 +25,7 @@ import { computed, ref } from "vue";
 import { useSidebar } from "../../hooks/UseSidebar";
 import { AdminMenu } from "../menu/AdminMenu";
 import { DirectorMenu } from "../menu/DirectorMenu";
+import { TeacherMenu } from "../menu/TeacherMenu";
 
 const isOpen = useSidebar();
 const props = defineProps({
@@ -36,6 +37,8 @@ const menu = computed(() => {
     return AdminMenu;
   } else if (role == "director") {
     return DirectorMenu;
+  } else if (role == "teacher") {
+    return TeacherMenu;
   }
 });
 </script>

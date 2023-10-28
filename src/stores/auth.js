@@ -24,6 +24,8 @@ const useAuthStore = defineStore({
           await router.push({ name: "students" });
         } else if (res?.user?.role == "director") {
           await router.push({ name: "staffs" });
+        } else if (res?.user?.role == "teacher") {
+          await router.push({ name: "teacher" });
         }
       } catch (err) {
         console.log(err);
