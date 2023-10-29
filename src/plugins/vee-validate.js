@@ -11,6 +11,13 @@ export default {
     defineRule("min", min);
     defineRule("max", max);
     defineRule("email", email);
+    defineRule("day_active", (value) => {
+      if (value == true || value == false) {
+        return "";
+      } else {
+        return "The field Day is required";
+      }
+    });
 
     configure({
       generateMessage: (ctx) => {
@@ -19,6 +26,7 @@ export default {
           min: `The field ${ctx.field} is too short`,
           max: `The field ${ctx.field} is too long`,
           email: `The field ${ctx.field} is invalid email`,
+          active: `The field ${ctx.field} is required`,
         };
         return messages[ctx.rule.name]
           ? messages[ctx.rule.name]

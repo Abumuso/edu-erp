@@ -1,9 +1,13 @@
 import axiosClient from "../apiClient";
 
 const adminStudent = {
-  getStudents(params) {
+  getStudents(params = {}) {
     const url = `admin/get-students/q?page=${params.page}&limit=${params.limit}`;
     return axiosClient.get(url);
+  },
+  getStudentSearch(search) {
+    const url = `student/search`;
+    return axiosClient.post(url, {phone:search});
   },
   createStudent(payload) {
     const url = "admin/add-student";

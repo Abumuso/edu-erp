@@ -6,6 +6,7 @@
       </h1>
       <h1 v-else class="text-center text-[30px] text-global1">Edit Group</h1>
     </div>
+    <!--==== Select Name ==== -->
     <Form @submit="save">
       <label for="name" class="text-global1 text-[20px] font-normal"
         >Name</label
@@ -27,17 +28,19 @@
           {{ errors[0] }}
         </p>
       </Field>
+
+      <!--==== Select Date ==== -->
       <div class="flex flex-col">
         <label for="name" class="text-global1 text-[18px] font-normal"
           >Select Date</label
         >
         <Field
           rules="required"
-          :modelValue="forms.name"
+          :modelValue="date_time_picker.date"
           v-slot="{ errors }"
           name="Date">
           <el-date-picker
-            v-model="value2"
+            v-model="date_time_picker.date"
             type="date"
             placeholder="Start a date"
             :default-value="new Date()"
@@ -57,13 +60,14 @@
           </p>
         </Field>
       </div>
+      <!--==== Select Day ==== -->
       <div class="flex flex-col">
         <label for="name" class="text-global1 text-[20px] font-normal"
-          >Select Date</label
+          >Select DaY</label
         >
         <Field
-          rules="required"
-          :modelValue="forms.name"
+          rules="day_active"
+          :modelValue="forms.days"
           v-slot="{ errors }"
           name="Days">
           <select
@@ -80,22 +84,31 @@
           </p>
         </Field>
       </div>
+      <!--==== Select Time ==== -->
       <div class="flex flex-col">
         <label for="name" class="text-global1 text-[20px] font-normal"
           >Select Time</label
         >
         <Field
           rules="required"
-          :modelValue="forms.name"
+          :modelValue="date_time_picker.time"
           v-slot="{ errors }"
-          name="Date">
+          name="Time">
           <el-time-picker
-            v-model="value1"
+            v-model="date_time_picker.time"
             is-range
             range-separator="To"
             start-placeholder="Start time"
             end-placeholder="End time"
-            @change="handleChangeTime($event)" />
+            @change="handleChangeTime($event)"
+            style="
+              width: 100%;
+              height: 50px;
+              border: 2px solid #12486b;
+              border-radius: 5px;
+              outline: none;
+              font-size: 21px;
+            " />
           <p
             class="text-error_color mt-2 text-[18px] font-medium"
             v-if="errors && errors.length">
@@ -103,44 +116,98 @@
           </p>
         </Field>
       </div>
-      <div v-if="store?.rooms.length">
-        <select class="m-3 border-2" v-model="select_room">
-          <option value="" selected hidden>Selected rooms</option>
-          <option
-            :value="item._id"
-            v-for="(item, index) in store?.rooms"
-            :key="index">
-            {{ item.name }}
-          </option>
-        </select>
+      <!--==== Select Group ==== -->
+      <div v-if="store?.rooms.length" class="flex flex-col">
+        <label for="name" class="text-global1 text-[20px] font-normal"
+          >Select Room</label
+        >
+        <Field
+          rules="required"
+          :modelValue="forms.room"
+          v-slot="{ errors }"
+          name="Name">
+          <select
+            v-model="forms.room"
+            class="w-full py-[12px] px-[10px] outline-none border-[1px] border-global1 rounded-md text-[21px]">
+            <option value="" selected hidden>Select rooms</option>
+            <option
+              :value="item._id"
+              v-for="(item, index) in store?.rooms"
+              :key="index">
+              {{ item.name }}
+            </option>
+          </select>
+          <p
+            class="text-error_color mt-2 text-[18px] font-medium"
+            v-if="errors && errors.length">
+            {{ errors[0] }}
+          </p>
+        </Field>
       </div>
-      <div>
-        <select
-          class="m-3 border-2"
-          v-model="select_course"
-          @change="handleChangeCourse($event)">
-          <option value="" selected hidden>Select course</option>
-          <option
-            :value="item._id"
-            v-for="(item, index) in store2?.courses"
-            :key="index">
-            {{ item.name }}
-          </option>
-        </select>
-        <select
-          class="m-3 border-2"
-          v-model="select_teacher"
-          v-if="store?.teachers.length">
-          <option value="" selected hidden>Select teacher</option>
-          <option
-            :value="item._id"
-            v-for="(item, index) in store?.teachers"
-            :key="index">
-            {{ item.first_name }}
-          </option>
-        </select>
+      <!--==== Select Course ==== -->
+      <div class="flex flex-col">
+        <label for="name" class="text-global1 text-[20px] font-normal"
+          >Select Course</label
+        >
+        <Field
+          rules="required"
+          :modelValue="forms.course"
+          v-slot="{ errors }"
+          name="Cpourse">
+          <select
+            v-model="forms.course"
+            @change="handleChangeCourse($event)"
+            class="w-full py-[12px] px-[10px] outline-none border-[1px] border-global1 rounded-md text-[21px]">
+            <option value="" selected hidden>Select course</option>
+            <option
+              :value="item._id"
+              v-for="(item, index) in store2?.courses"
+              :key="index">
+              {{ item.name }}
+            </option>
+          </select>
+          <p
+            class="text-error_color mt-2 text-[18px] font-medium"
+            v-if="errors && errors.length">
+            {{ errors[0] }}
+          </p>
+        </Field>
       </div>
-      <VButton btn_type="primary" @click="save">create group</VButton>
+      <!--==== Select Teacher ==== -->
+      <div class="flex flex-col">
+        <label
+          v-if="group_store?.teachers.length"
+          for="name"
+          class="text-global1 text-[20px] font-normal"
+          >Select Teacher</label
+        >
+        <Field
+          rules="required"
+          :modelValue="forms.teacher"
+          v-slot="{ errors }"
+          name="Teacher">
+          <select
+            class="m-3 border-2"
+            v-model="forms.teacher"
+            v-if="group_store?.teachers.length">
+            <option value="" selected hidden>Select teacher</option>
+            <option
+              :value="item._id"
+              v-for="(item, index) in group_store?.teachers"
+              :key="index">
+              {{ item.first_name }}
+            </option>
+          </select>
+          <p
+            class="text-error_color mt-2 text-[18px] font-medium"
+            v-if="errors && errors.length && group_store?.teachers.length">
+            {{ errors[0] }}
+          </p>
+        </Field>
+      </div>
+      <div class="flex justify-center mt-[30px]">
+        <VButton btn_type="primary">{{ btn_title }}</VButton>
+      </div>
     </Form>
   </AppModal>
 </template>
@@ -165,7 +232,9 @@ const forms = ref({
   start_time: "",
   end_time: "",
   room: "",
-  course: "",
+  course: {
+    name: "",
+  },
   days: "",
   status: "",
   teacher: "",
@@ -209,6 +278,7 @@ const handleChangeCourse = async (e) => {
 };
 
 const openModal = (item) => {
+  if (item) forms.value = { ...item };
   dialog.value = true;
   course_store.getAdminCourses({
     page: 1,
